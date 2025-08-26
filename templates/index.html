@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ev Genci Kazanç Hesaplayıcı</title>
+    <title>Mezuniyet Sonrası Potansiyel Gelir Hesaplayıcısı</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -124,6 +124,10 @@
             font-size: 20px;
         }
         
+        .result-container {
+            display: none;
+        }
+        
         .result {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             padding: 25px;
@@ -177,7 +181,61 @@
             color: #2c3e50;
             font-size: 17px;
         }
+
+        /* Tooltip stili */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
         
+        .tooltip-container.gecen-gun-tooltip .tooltip-text {
+            top: auto;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+        }
+        
+        .tooltip-container.gecen-gun-tooltip .tooltip-text::after {
+            top: 100%;
+            border-color: #555 transparent transparent transparent;
+        }
+
         .total {
             background: white;
             padding: 20px;
@@ -216,6 +274,34 @@
             font-size: 15px;
         }
         
+        /* Açıklama alanı için stil */
+        .comment {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); /* Renk gradyanı eklendi */
+            border: 1px solid #64b5f6; /* Yeni kenarlık rengi */
+            color: #0d47a1; /* Yeni metin rengi */
+            text-align: left;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 15px; /* Daha yuvarlak köşeler */
+            font-weight: 500;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Hafif gölge */
+        }
+
+        .comment h4 {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #1565c0; /* Başlık rengi */
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
         @media (max-width: 600px) {
             .container {
                 padding: 25px;
@@ -245,18 +331,16 @@
             <div class="header-icon">
                 <i class="fas fa-calculator"></i>
             </div>
-            <h1>Ev Genci Kazanç Hesaplayıcı</h1>
-            <p>Mezuniyetinizden bu yana ne kadar kazanç kaybettiğinizi hesaplayın</p>
+            <h1>Mezuniyet Bilançosu</h1>
+            <p>Mezuniyetinizden bu yana kazanma potansiyeliniz olan ama kazanamadığınız gelirinizi hesaplayın.</p>
         </div>
         
-        {% if error %}
-        <div class="error">
+        <div id="error-message" class="error" style="display:none;">
             <i class="fas fa-exclamation-circle"></i>
-            <span>{{ error }}</span>
+            <span id="error-text"></span>
         </div>
-        {% endif %}
         
-        <form method="POST">
+        <form id="calculator-form">
             <div class="form-group">
                 <label for="bolum"><i class="fas fa-graduation-cap"></i> Mezun Olduğunuz Bölüm</label>
                 <select name="bolum" id="bolum" required>
@@ -272,61 +356,164 @@
                 <input type="date" name="mezuniyet" id="mezuniyet" required>
             </div>
             
-            <button type="submit">
+            <button type="submit" id="calculate-button">
                 <i class="fas fa-calculator"></i> HESAPLA
             </button>
         </form>
         
-        {% if sonuc %}
-        <div class="result">
-            <h3><i class="fas fa-chart-line"></i> Hesaplama Sonuçları</h3>
-            
-            <div class="result-item">
-                <span class="result-label"><i class="fas fa-book"></i> Bölüm:</span>
-                <span class="result-value">{{ sonuc.bolum }}</span>
-            </div>
-            
-            <div class="result-item">
-                <span class="result-label"><i class="fas fa-calendar-day"></i> Geçen Gün Sayısı:</span>
-                <span class="result-value">{{ sonuc.gecen_gun_sayisi }} gün</span>
-            </div>
-            
-            <div class="result-item">
-                <span class="result-label"><i class="fas fa-money-bill-wave"></i> Aylık Maaş:</span>
-                <span class="result-value">{{ "{:,}".format(sonuc.aylik_maas) }} ₺</span>
-            </div>
-            
-            <div class="total">
-                <div>Toplam Kazanç Kaybı</div>
-                <div class="total-amount">{{ "{:,.2f}".format(sonuc.toplam_kayip) }} ₺</div>
-                <div>Mezuniyetinizden Beri</div>
-            </div>
-            
-            <div class="motivation critical">
-                <i class="fas fa-exclamation-triangle"></i>
-                <div class="critical-message">
-                    <strong>Gerçeklerle Yüzleşme Zamanı!</strong><br>
-                    LinkedIn'de yüzlerce başvuru yapıp hiç dönüş alamamanın,<br>
-                    "Referanssız iş bulunmaz" gerçeğiyle yüzleşmenin<br>
-                    ve diplomanın aslında bir "referans mektubuna" dönüşmediğinin<br>
-                    acı bilançosu işte tam da burada!
+        <div id="result-container" class="result-container">
+            <div class="result">
+                <h3><i class="fas fa-chart-line"></i> Hesaplama Sonuçları</h3>
+                
+                <div class="result-item">
+                    <span class="result-label"><i class="fas fa-book"></i> Bölüm:</span>
+                    <span class="result-value" id="result-bolum"></span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-calendar-day"></i> Geçen Gün Sayısı:
+                        <span class="tooltip-container gecen-gun-tooltip">
+                            <i class="fas fa-info-circle" style="font-size: 14px; color: #667eea;"></i>
+                            <span class="tooltip-text">İş yasası kapsamında standart çalışma saati haftalık 45 saat olarak belirlenmiştir fakat meslek çeşitliliğinden dolayı çalışılan gün 30 gün olacak şekilde hesaplanmıştır.</span>
+                        </span>
+                    </span>
+                    <span class="result-value" id="result-gecen-gun"></span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">
+                        <i class="fas fa-money-bill-wave"></i> Ortalama Maaş Beklentisi:
+                        <span class="tooltip-container">
+                            <i class="fas fa-info-circle" style="font-size: 14px; color: #667eea;"></i>
+                            <span class="tooltip-text">Ortalama maaş beklentisi Kariyer.net ve Eleman.net sitelerinden alınan verilerle sağlanmıştır. İş tecrübesi olarak yeni mezun yani 0-1 yıl tecrübeyi kapsayan maaş aralığı tercih edilerek hesaplamalar yapılmıştır.</span>
+                        </span>
+                    </span>
+                    <span class="result-value" id="result-aylik-maas"></span>
+                </div>
+    
+                <div class="result-item">
+                    <span class="result-label"><i class="fas fa-chart-bar"></i> Maaş Aralığı:</span>
+                    <span class="result-value" id="result-maas-araligi"></span>
+                </div>
+                
+                <div class="total">
+                    <div>Toplam Kazanç Kaybı</div>
+                    <div class="total-amount" id="total-loss"></div>
+                    <div>Mezuniyetinizden Beri</div>
+                </div>
+                
+                <div class="comment">
+                    <h4><i class="fas fa-question-circle"></i> Ev Genci Nedir?</h4>
+                    <p>Ev genci, üniversiteyi bitirmesine rağmen, işsizlik veya tatmin edici bir iş bulamama gibi nedenlerle ailesinin yanında yaşamaya devam eden ve ekonomik bağımsızlığını kazanamayan gençlere verilen ironik bir isimdir. Bu durum, sadece maddi bir kayıp değil, aynı zamanda potansiyelin ve kariyer hedeflerinin de belirsizliğe dönüşmesidir.</p>
+                </div>
+                
+                <div class="motivation critical">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="critical-message">
+                        <strong>Gerçeklerle Yüzleşme Zamanı!</strong><br>
+                        LinkedIn'de yüzlerce başvuru yapıp hiç dönüş alamamanın,<br>
+                        "Referanssız iş bulunmaz" gerçeğiyle yüzleşmenin<br>
+                        yıllarca okuyup bir diploma almak için harcanan çabanın,
+                        iş dünyasında bir referans kadar bile değer görmemesinin<br>
+                        yarattığı acı verici sonuç işte tam da burada!<br>
+                        
+                    </div>
                 </div>
             </div>
         </div>
-        {% endif %}
     </div>
 
     <script>
         // Bugünün tarihini maksimum değer olarak ayarla
         document.getElementById('mezuniyet').max = new Date().toISOString().split('T')[0];
+
+        const form = document.getElementById('calculator-form');
+        const button = document.getElementById('calculate-button');
+        const resultContainer = document.getElementById('result-container');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
         
-        // Form gönderildiğinde yükleniyor animasyonu
-        document.querySelector('form').addEventListener('submit', function() {
-            const button = document.querySelector('button');
+        let lossInterval = null;
+
+        // Form gönderimi olayını dinle
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Sayfanın yeniden yüklenmesini engelle
+            
+            // Yükleniyor durumunu göster
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> HESAPLANIYOR...';
             button.disabled = true;
+            resultContainer.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Girdi değerlerini al
+            const bolum = document.getElementById('bolum').value;
+            const mezuniyetTarihi = document.getElementById('mezuniyet').value;
+
+            // API'ye gönderilecek veriyi hazırla
+            const requestData = {
+                bolum: bolum,
+                mezuniyet: mezuniyetTarihi
+            };
+
+            try {
+                // Flask API'sine POST isteği gönder
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Hesaplama sırasında bir hata oluştu.');
+                }
+
+                // Sonuçları HTML'e yaz
+                document.getElementById('result-bolum').textContent = data.bolum;
+                document.getElementById('result-gecen-gun').textContent = `${data.gecen_gun_sayisi} gün`;
+                document.getElementById('result-aylik-maas').textContent = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(data.aylik_maas);
+                document.getElementById('result-maas-araligi').textContent = data.maas_araligi;
+                
+                const totalLossElement = document.getElementById('total-loss');
+                totalLossElement.textContent = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(data.toplam_kayip);
+                
+                // Sonuçları göster
+                resultContainer.style.display = 'block';
+
+                // Gerçek zamanlı güncellemeyi başlat
+                let currentLoss = data.toplam_kayip;
+                const dailyLoss = data.aylik_maas / 30;
+                const perSecondLoss = dailyLoss / (24 * 60 * 60);
+
+                // Önceki interval'ı temizle
+                if (lossInterval) {
+                    clearInterval(lossInterval);
+                }
+
+                // Her saniye değeri güncelle
+                lossInterval = setInterval(() => {
+                    currentLoss += perSecondLoss;
+                    totalLossElement.textContent = new Intl.NumberFormat('tr-TR', {
+                        style: 'currency',
+                        currency: 'TRY',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }).format(currentLoss);
+                }, 1000);
+            } catch (error) {
+                errorText.textContent = error.message;
+                errorMessage.style.display = 'flex';
+            } finally {
+                // Butonu eski haline getir
+                button.innerHTML = '<i class="fas fa-calculator"></i> HESAPLA';
+                button.disabled = false;
+            }
         });
-        
+
         // Sayfa yüklendiğinde tarih alanına odaklan
         window.addEventListener('load', function() {
             document.getElementById('mezuniyet').focus();
