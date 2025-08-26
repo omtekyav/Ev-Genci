@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ev Genci Kazanç Hesaplayıcı</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 550px;
+            margin: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 17px;
+            line-height: 1.5;
+        }
+        
+        .header-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #d32f2f;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 5px solid #d32f2f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .error i {
+            font-size: 20px;
+        }
+        
+        .result {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border-left: 5px solid #667eea;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+            align-items: center;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 17px;
+        }
+        
+        .total {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+            border: 2px dashed #667eea;
+        }
+        
+        .total-amount {
+            font-size: 28px;
+            font-weight: 800;
+            color: #d32f2f;
+            margin: 10px 0;
+        }
+        
+        .critical {
+            background: #fff3e0 !important;
+            border: 1px solid #ff9800;
+            color: #e65100 !important;
+            text-align: center;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .critical i {
+            color: #ff6d00;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .critical-message {
+            font-size: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            .header h1 {
+                font-size: 26px;
+            }
+            
+            .header-icon {
+                font-size: 40px;
+            }
+            
+            .total-amount {
+                font-size: 24px;
+            }
+            
+            .critical-message {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">
+                <i class="fas fa-calculator"></i>
+            </div>
+            <h1>Ev Genci Kazanç Hesaplayıcı</h1>
+            <p>Mezuniyetinizden bu yana ne kadar kazanç kaybettiğinizi hesaplayın</p>
+        </div>
+        
+        {% if error %}
+        <div class="error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="bolum"><i class="fas fa-graduation-cap"></i> Mezun Olduğunuz Bölüm</label>
+                <select name="bolum" id="bolum" required>
+                    <option value="">Bölümünüzü seçin</option>
+                    {% for b in bolum_list %}
+                    <option value="{{ b }}">{{ b }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="mezuniyet"><i class="fas fa-calendar-alt"></i> Mezuniyet Tarihiniz</label>
+                <input type="date" name="mezuniyet" id="mezuniyet" required>
+            </div>
+            
+            <button type="submit">
+                <i class="fas fa-calculator"></i> HESAPLA
+            </button>
+        </form>
+        
+        {% if sonuc %}
+        <div class="result">
+            <h3><i class="fas fa-chart-line"></i> Hesaplama Sonuçları</h3>
+            
+            <div class="result-item">
+                <span class="result-label"><i class="fas fa-book"></i> Bölüm:</span>
+                <span class="result-value">{{ sonuc.bolum }}</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label"><i class="fas fa-calendar-day"></i> Geçen Gün Sayısı:</span>
+                <span class="result-value">{{ sonuc.gecen_gun_sayisi }} gün</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label"><i class="fas fa-money-bill-wave"></i> Aylık Maaş:</span>
+                <span class="result-value">{{ "{:,}".format(sonuc.aylik_maas) }} ₺</span>
+            </div>
+            
+            <div class="total">
+                <div>Toplam Kazanç Kaybı</div>
+                <div class="total-amount">{{ "{:,.2f}".format(sonuc.toplam_kayip) }} ₺</div>
+                <div>Mezuniyetinizden Beri</div>
+            </div>
+            
+            <div class="motivation critical">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="critical-message">
+                    <strong>Gerçeklerle Yüzleşme Zamanı!</strong><br>
+                    LinkedIn'de yüzlerce başvuru yapıp hiç dönüş alamamanın,<br>
+                    "Referanssız iş bulunmaz" gerçeğiyle yüzleşmenin<br>
+                    ve diplomanın aslında bir "referans mektubuna" dönüşmediğinin<br>
+                    acı bilançosu işte tam da burada!
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Bugünün tarihini maksimum değer olarak ayarla
+        document.getElementById('mezuniyet').max = new Date().toISOString().split('T')[0];
+        
+        // Form gönderildiğinde yükleniyor animasyonu
+        document.querySelector('form').addEventListener('submit', function() {
+            const button = document.querySelector('button');
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> HESAPLANIYOR...';
+            button.disabled = true;
+        });
+        
+        // Sayfa yüklendiğinde tarih alanına odaklan
+        window.addEventListener('load', function() {
+            document.getElementById('mezuniyet').focus();
+        });
+    </script>
+</body>
+</html>
