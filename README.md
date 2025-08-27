@@ -1,4 +1,8 @@
-# Mezuniyet Bilançosu Hesaplayıcı - README
+# Mezuniyet Bilançosu - README
+## 🌐 Canlı Demo
+Projenin canlıya alınmış haline aşağıdaki linkten ulaşabilirsiniz:
+🔗 https://omtekyav.pythonanywhere.com/
+
 
 ## 📋 Proje Özeti
 Mezuniyet Bilançosu Hesaplayıcı, üniversite mezunlarının mezuniyetlerinden bu yana potansiyel olarak kaçırdıkları kazancı hesaplayan bir web uygulamasıdır. Kullanıcılar mezun oldukları bölümü ve mezuniyet tarihini girerek, işsiz geçen sürede kaybettikleri geliri görebilirler.
